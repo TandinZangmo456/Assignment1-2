@@ -46,6 +46,8 @@
  *   Expand the super-vertex back, removing exactly one edge of
  *   the cycle C — the one that was "replaced" by the incoming
  *   edge chosen for the super-vertex in the recursive step.
+ * 
+ * Example given below
  */
 
 #include <iostream>

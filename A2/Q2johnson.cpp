@@ -1,3 +1,56 @@
+/*
+ * QUESTIONS AND ANSWERS
+ *
+ * (a) WHY JOHNSON'S IS MORE EFFICIENT THAN FLOYD-WARSHALL
+ *     FOR SPARSE GRAPHS:
+ *
+ *     Floyd-Warshall: O(V³) time, O(V²) space — always.
+ *     Johnson's     : O(V² log V + VE) time
+ *
+ *     For a SPARSE graph where E << V², Johnson's is faster:
+ *       - Sparse example: E = O(V) → Johnson's = O(V² log V)
+ *         vs Floyd's O(V³) — significantly faster for large V.
+ *       - Dense graph (E ≈ V²): both are roughly equivalent.
+ *
+ *     Real-world sparse graphs: road networks, social graphs,
+ *     sparse dependency trees — Johnson's is the clear winner.
+ *
+ *
+ * (b) EDGE REWEIGHTING AND BELLMAN-FORD'S ROLE:
+ *
+ *     Problem: Dijkstra requires non-negative edge weights.
+ *     But the graph may have negative weights.
+ *
+ *     Solution — Johnson's reweighting trick:
+ *       1. Add a virtual source vertex q with zero-cost edges
+ *          to every vertex in the graph.
+ *       2. Run Bellman-Ford from q → get h[v] for each vertex
+ *          (h[v] = shortest distance from q to v).
+ *       3. Reweight each edge (u,v,w):
+ *             w'(u,v) = w + h[u] - h[v]
+ *          This is ALWAYS ≥ 0 (triangle inequality guarantees it).
+ *       4. Now run Dijkstra from every vertex on the reweighted
+ *          graph safely.
+ *       5. Restore original distances:
+ *             d(u,v) = dijkstra_dist[v] - h[u] + h[v]
+ *
+ *     Why does reweighting preserve shortest paths?
+ *       The reweighting adds h[u] and subtracts h[v] along every
+ *       path. For any path u→...→v, the total adjustment is
+ *       always h[u] - h[v] regardless of the path taken.
+ *       So relative ordering of paths is preserved — shortest
+ *       path before = shortest path after reweighting.
+ *
+ * COMPLEXITY SUMMARY:
+ *   Bellman-Ford step : O(VE)
+ *   V × Dijkstra      : O(V(E + V) log V) with a min-heap
+ *   Total             : O(VE + V² log V)
+ * 
+ * 
+ * Example implemented below
+ */
+
+
 #include <iostream>
 #include <vector>
 #include <queue>
@@ -94,51 +147,3 @@ int main() {
     return 0;
 }
 
-/*
- * QUESTIONS AND ANSWERS
- *
- * (a) WHY JOHNSON'S IS MORE EFFICIENT THAN FLOYD-WARSHALL
- *     FOR SPARSE GRAPHS:
- *
- *     Floyd-Warshall: O(V³) time, O(V²) space — always.
- *     Johnson's     : O(V² log V + VE) time
- *
- *     For a SPARSE graph where E << V², Johnson's is faster:
- *       - Sparse example: E = O(V) → Johnson's = O(V² log V)
- *         vs Floyd's O(V³) — significantly faster for large V.
- *       - Dense graph (E ≈ V²): both are roughly equivalent.
- *
- *     Real-world sparse graphs: road networks, social graphs,
- *     sparse dependency trees — Johnson's is the clear winner.
- *
- *
- * (b) EDGE REWEIGHTING AND BELLMAN-FORD'S ROLE:
- *
- *     Problem: Dijkstra requires non-negative edge weights.
- *     But the graph may have negative weights.
- *
- *     Solution — Johnson's reweighting trick:
- *       1. Add a virtual source vertex q with zero-cost edges
- *          to every vertex in the graph.
- *       2. Run Bellman-Ford from q → get h[v] for each vertex
- *          (h[v] = shortest distance from q to v).
- *       3. Reweight each edge (u,v,w):
- *             w'(u,v) = w + h[u] - h[v]
- *          This is ALWAYS ≥ 0 (triangle inequality guarantees it).
- *       4. Now run Dijkstra from every vertex on the reweighted
- *          graph safely.
- *       5. Restore original distances:
- *             d(u,v) = dijkstra_dist[v] - h[u] + h[v]
- *
- *     Why does reweighting preserve shortest paths?
- *       The reweighting adds h[u] and subtracts h[v] along every
- *       path. For any path u→...→v, the total adjustment is
- *       always h[u] - h[v] regardless of the path taken.
- *       So relative ordering of paths is preserved — shortest
- *       path before = shortest path after reweighting.
- *
- * COMPLEXITY SUMMARY:
- *   Bellman-Ford step : O(VE)
- *   V × Dijkstra      : O(V(E + V) log V) with a min-heap
- *   Total             : O(VE + V² log V)
- */

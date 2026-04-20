@@ -1,3 +1,36 @@
+/*
+ * ANSWERS
+ *
+ * (a) MODELLING AS A WEIGHTED DIRECTED GRAPH:
+ *     - Each currency = a vertex
+ *     - Each exchange rate R[i][j] = a directed edge i → j
+ *     - Edge weight = R[i][j] (the multiplier)
+ *     - Arbitrage = a cycle where product of weights > 1
+ *
+ * (b) LOGARITHMIC TRANSFORMATION:
+ *     Maximize: R[i][j] × R[j][k] × ... > 1
+ *     Taking -log(): -log(R[i][j]) + -log(R[j][k]) + ... < 0
+ *     This converts a multiplicative cycle product problem
+ *     into an additive shortest-path/negative-cycle problem.
+ *     Key insight: log converts multiplication → addition,
+ *     and the negation flips maximization → minimization.
+ *
+ * (c) ALGORITHM USED — BELLMAN-FORD:
+ *     Justification:
+ *     - We need to detect negative cycles → Bellman-Ford is
+ *       the standard algorithm for this.
+ *     - Dijkstra cannot be used here: after log transformation,
+ *       weights can be negative (when R[i][j] > 1).
+ *     - Floyd-Warshall could also work (check dist[i][i] < 0)
+ *       but Bellman-Ford is O(VE) vs Floyd's O(V³) — better
+ *       for sparse currency graphs.
+ *     - Run Bellman-Ford with all dist[] = 0 (virtual source
+ *       connected to all vertices with 0-cost edges), then
+ *       check if V-th relaxation still updates → negative cycle.
+ * 
+ * Example given below
+ */
+
 #include <iostream>
 #include <vector>
 #include <cmath>
@@ -65,33 +98,3 @@ int main() {
     return 0;
 }
 
-/*
- * ANSWERS
- *
- * (a) MODELLING AS A WEIGHTED DIRECTED GRAPH:
- *     - Each currency = a vertex
- *     - Each exchange rate R[i][j] = a directed edge i → j
- *     - Edge weight = R[i][j] (the multiplier)
- *     - Arbitrage = a cycle where product of weights > 1
- *
- * (b) LOGARITHMIC TRANSFORMATION:
- *     Maximize: R[i][j] × R[j][k] × ... > 1
- *     Taking -log(): -log(R[i][j]) + -log(R[j][k]) + ... < 0
- *     This converts a multiplicative cycle product problem
- *     into an additive shortest-path/negative-cycle problem.
- *     Key insight: log converts multiplication → addition,
- *     and the negation flips maximization → minimization.
- *
- * (c) ALGORITHM USED — BELLMAN-FORD:
- *     Justification:
- *     - We need to detect negative cycles → Bellman-Ford is
- *       the standard algorithm for this.
- *     - Dijkstra cannot be used here: after log transformation,
- *       weights can be negative (when R[i][j] > 1).
- *     - Floyd-Warshall could also work (check dist[i][i] < 0)
- *       but Bellman-Ford is O(VE) vs Floyd's O(V³) — better
- *       for sparse currency graphs.
- *     - Run Bellman-Ford with all dist[] = 0 (virtual source
- *       connected to all vertices with 0-cost edges), then
- *       check if V-th relaxation still updates → negative cycle.
- */
